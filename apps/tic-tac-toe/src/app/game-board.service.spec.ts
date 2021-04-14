@@ -27,50 +27,18 @@ describe('GameBoardService', () => {
       expect(s.winningPositions).toHaveLength(
         3 /*colonnes*/ + 3 /*lignes*/ + 2 /*diagonales*/
       );
-      expect(s.winningPositions).toMatchInlineSnapshot(`
-        Array [
-          Array [
-            1,
-            2,
-            3,
-          ],
-          Array [
-            1,
-            4,
-            7,
-          ],
-          Array [
-            4,
-            5,
-            6,
-          ],
-          Array [
-            2,
-            5,
-            8,
-          ],
-          Array [
-            7,
-            8,
-            9,
-          ],
-          Array [
-            3,
-            6,
-            9,
-          ],
-          Array [
-            1,
-            5,
-            9,
-          ],
-          Array [
-            3,
-            5,
-            7,
-          ],
-        ]
-      `);
+      expect(s.winningPositions).toEqual(
+        [
+          [1, 2, 3],
+          [4, 5, 6],
+          [7, 8, 9],
+          [1, 4, 7],
+          [2, 5, 8],
+          [3, 6, 9],
+          [1, 5, 9],
+          [3, 5, 7],
+        ],
+      );
       done();
     });
   });

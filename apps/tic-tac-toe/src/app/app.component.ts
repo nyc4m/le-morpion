@@ -8,7 +8,7 @@ import { GameBoardService } from './game-board.service';
 })
 export class AppComponent implements OnInit {
 
-  readonly size = 3;
+  readonly size = 5;
   
   constructor(public gameBoard: GameBoardService) {}
 

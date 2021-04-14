@@ -16,11 +16,6 @@ const nullValues = <T>(v: T | null): v is T => Boolean(v);
   providedIn: 'root',
 })
 export class GameBoardService {
-  readonly WINNING_POSITIONS = [
-    [1, 5, 9],
-    [3, 5, 7],
-    [4, 5, 6],
-  ];
 
   errors$ = new Subject();
 
@@ -54,21 +49,9 @@ export class GameBoardService {
     });
   }
 
-  private generateWinningPositions(size: number) {
-    let positions = [];
-    for (let col = 0; col < size; col++) {
-      let lines = [];
-      let columns = [];
-
-      for (let row = 1; row <= size; row++) {
-        lines.push(row + size * col);
-      }
-      for (let row = 0; row < size; row++) {
-        columns.push(col + 1 + row * size);
-      }
-      positions.push(lines);
-      positions.push(columns);
-    }
+  private generateWinningPositions(size: number): number[][] {
+    const lines = this.chunk([...Array(Math.pow(size, 2)).keys()].map(i => i+1), size)
+    const cols = this.transpose(lines)
 
     let diagonal1 = [] as number[]
     let diagonal2 = [] as number[]
@@ -77,11 +60,29 @@ export class GameBoardService {
       diagonal1.push(1+(i*(size+1)))
       diagonal2.push(size+(i*(size-1)))
     }
-    positions.push(diagonal1);
-    positions.push(diagonal2);
-    console.log({positions});
     
-    return positions;
+    return [
+      ...lines, ...cols, diagonal1, diagonal2
+    ];
+  }
+
+  private readonly chunk = (cells: number[], size: number): number[][] => {
+    if(cells.length === size) {
+      return [cells];
+    }
+    return [cells.slice(0, size)].concat(this.chunk(cells.slice(size), size))
+  }
+
+  /**
+   * Apply the following transformation
+   * 1 2 3    1 4 7
+   * 4 5 6 => 2 5 8
+   * 7 8 9    3 6 9
+   * @param lines 2D array
+   * @returns a new array, which is the transposition of the input
+   */
+  private transpose(lines: number[][]): number[][] {
+    return lines.map((_, index) => lines.map(line => line[index]));
   }
 
   toggleCaseForCurrentPlayer(id: number): void {
@@ -105,7 +106,7 @@ export class GameBoardService {
             ...s,
             board: newBoard,
             current: s.nextPlayer,
-            winner: this.determineWinner(s.current, newBoard),
+            winner: this.determineWinner(s.current, newBoard, s.winningPositions),
           });
         },
         (err) => this.errors$.next(err)
@@ -114,9 +115,10 @@ export class GameBoardService {
 
   readonly determineWinner = (
     currentPlayer: TicTacToePlayer,
-    cells: readonly Case[]
+    cells: readonly Case[],
+    winningPositions: number[][]
   ): TicTacToePlayer | null => {
-    return this.WINNING_POSITIONS.find((lines) => {
+    return winningPositions.find((lines) => {
       return lines.every(
         (cellId) => cells[cellId - 1].player === currentPlayer
       );
