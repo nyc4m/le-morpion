@@ -1,10 +1,17 @@
-<ng-container>
-  <p>current player: {{ gameBoard.currentPlayer$ | async }}</p>
-  <p *ngIf="gameBoard.winner$ | async as winner">player {{winner}}</p>
-  <div *ngIf="gameBoard.board$ | async as board" [ticTacToeCellContainer]='size'>
-    <div class='cell' *ngFor="let case of board" (click)="play(case.id)">
+<mat-toolbar class="toolbar">
+  <h1 class="toolbar-title">Le morpion</h1>
+  <button class="toolbar-restart" mat-raised-button color="warn" (click)='gameBoard.init(size)'>Restart the game</button>
+</mat-toolbar>
+<div class="main-content">
+
+  <div class="home-container">
+    <p>current player: {{ gameBoard.currentPlayer$ | async }}</p>
+    <p *ngIf="gameBoard.winner$ | async as winner">player {{winner}}</p>
+    <div *ngIf="gameBoard.board$ | async as board" [ticTacToeCellContainer]='size'>
+      <div matRipple class='cell' *ngFor="let case of board" (click)="play(case.id)">
         {{ case.player }}
+      </div>
     </div>
   </div>
-  <button (click)='gameBoard.init(size)'>Restart the game</button>
-</ng-container>
+
+</div>
